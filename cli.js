@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // cli.js
-const { intro, select, spinner, outro, note, confirm } = require('@clack/prompts');
+const { intro, select, spinner, outro, note, confirm, text } = require('@clack/prompts');
 const figlet = require('figlet');
 const { getConflicts } = require('./depfix');
 const { Command } = require('commander');
@@ -23,7 +23,7 @@ let chalk;
 
   const program = new Command();
   program
-    .version('1.0.0')
+    .version('1.0.1')  // Match package.json version
     .description('OhMyFix CLI Tool');
 
   program
@@ -38,10 +38,22 @@ let chalk;
       await aiCodeReview();
     });
 
+  program
+    .command('setup')
+    .description('Set up your Google Generative AI API key')
+    .action(async () => {
+      await setupApiKey();
+    });
+
   await program.parseAsync(process.argv);
 })().catch(console.error);
 
 async function main() {
+  if (!process.env.GOOGLE_API_KEY) {
+    console.log(chalk.yellow('⚠ No Google API key found. Please run `ohmyfix setup` to configure it.'));
+    return;
+  }
+
   const action = await select({
     message: 'What do you need help with?',
     options: [
@@ -69,7 +81,7 @@ async function main() {
 async function aiCodeReview() {
   const apiKey = process.env.GOOGLE_API_KEY;
   if (!apiKey) {
-    console.error(chalk.red('Error: Google API key not found. Please run `npm install` again or set GOOGLE_API_KEY in .env'));
+    console.error(chalk.red('Error: Google API key not found. Please run `ohmyfix setup` to configure it.'));
     return;
   }
 
@@ -78,14 +90,12 @@ async function aiCodeReview() {
   const s = spinner();
   s.start('Scanning codebase for errors...');
 
-  // Scan for .js files
   const codeFiles = await scanCodebase(process.cwd());
   if (codeFiles.length === 0) {
     s.stop(chalk.red('Error: No .js files found in the current directory'));
     return;
   }
 
-  // Read code content
   const codeContent = await Promise.all(
     codeFiles.map(async file => {
       const content = await fs.readFile(file, 'utf8');
@@ -95,7 +105,6 @@ async function aiCodeReview() {
 
   s.stop('Codebase scanned! Analyzing errors...');
 
-  // Analyze with Gemini
   for (const { file, content } of codeContent) {
     const prompt = `
       Analyze this JavaScript code from file "${file}":
@@ -121,7 +130,6 @@ async function aiCodeReview() {
         continue;
       }
 
-      // Parse Gemini's response (assuming it follows the format)
       const lines = review.split('\n');
       const errors = [];
       let currentError = null;
@@ -140,7 +148,6 @@ async function aiCodeReview() {
         }
       }
 
-      // Interactive UI for each error
       for (const error of errors) {
         note(
           `${chalk.red('✗ Error:')} ${error.description}\n\n${chalk.cyan('Solution:')}\n${error.solution}`,
@@ -167,7 +174,21 @@ async function aiCodeReview() {
   outro('Code review complete!');
 }
 
-// Recursively scan for .js files
+async function setupApiKey() {
+  intro('OhMyFix Setup');
+  const apiKey = await text({
+    message: 'Please enter your Google Generative AI API key (get it from https://makersuite.google.com/app/apikey):',
+    placeholder: 'AI...',
+    validate: value => {
+      if (!value || !value.startsWith('AI')) return 'Please enter a valid Google API key starting with "AI"';
+    }
+  });
+
+  const envContent = `GOOGLE_API_KEY=${apiKey}\n`;
+  await fs.writeFile(path.join(process.cwd(), '.env'), envContent, { flag: 'w' });
+  outro('Setup complete! Your API key has been saved to .env');
+}
+
 async function scanCodebase(dir) {
   const files = await fs.readdir(dir, { withFileTypes: true });
   const jsFiles = [];
