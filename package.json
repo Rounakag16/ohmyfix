@@ -1,6 +1,6 @@
 {
   "name": "ohmyfix",
-  "version": "1.0.1",  
+  "version": "1.0.2",  
   "description": "A CLI tool to fix JavaScript code errors and dependency conflicts using AI. Run `ohmyfix setup` to configure your Google API key after install.",
   "bin": {
     "ohmyfix": "./cli.js"

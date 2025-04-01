@@ -14,7 +14,6 @@ let chalk;
 (async () => {
   chalk = (await import('chalk')).default;
 
-  // Fancy intro banner
   console.log(
     chalk.blue(
       figlet.textSync('OhMyFix', { horizontalLayout: 'full' })
@@ -23,7 +22,7 @@ let chalk;
 
   const program = new Command();
   program
-    .version('1.0.1')  // Match package.json version
+    .version('1.0.2')  // Update to 1.0.2 after testing
     .description('OhMyFix CLI Tool');
 
   program
@@ -111,13 +110,15 @@ async function aiCodeReview() {
       \`\`\`javascript
       ${content}
       \`\`\`
-      - List only syntax errors or typos (e.g., undefined variables, wrong method names).
-      - For each error, provide only the corrected code snippet as the solution.
+      - List only syntax errors or typos (e.g., missing semicolons, undefined variables, wrong method names).
+      - For each error, provide:
+        - The exact line of code containing the error (as it appears in the original code).
+        - The corrected line of code as the solution.
       - If no errors, return "No errors found".
       - Format each error and solution as:
-        Error: <description>
+        Error: <exact erroneous line>
         Solution: \`\`\`javascript
-        <corrected code>
+        <corrected line>
         \`\`\`
     `;
 
@@ -136,7 +137,7 @@ async function aiCodeReview() {
 
       for (const line of lines) {
         if (line.startsWith('Error:')) {
-          currentError = { description: line.replace('Error: ', '').trim() };
+          currentError = { erroneousLine: line.replace('Error: ', '').trim() };
         } else if (line.startsWith('Solution: ```javascript')) {
           const solutionLines = [];
           for (let i = lines.indexOf(line) + 1; i < lines.length && !lines[i].startsWith('```'); i++) {
@@ -150,7 +151,7 @@ async function aiCodeReview() {
 
       for (const error of errors) {
         note(
-          `${chalk.red('✗ Error:')} ${error.description}\n\n${chalk.cyan('Solution:')}\n${error.solution}`,
+          `${chalk.red('✗ Error:')} ${error.erroneousLine}\n\n${chalk.cyan('Solution:')}\n${error.solution}`,
           `File: ${file}`
         );
 
@@ -160,8 +161,37 @@ async function aiCodeReview() {
         });
 
         if (applyFix) {
-          await fs.writeFile(path.join(process.cwd(), file), error.solution);
-          note(chalk.green('✓ Fix applied successfully!'), `File: ${file}`);
+          const fileLines = content.split('\n');
+          let foundMatch = false;
+
+          // Try exact match first, then relaxed match (ignoring whitespace)
+          const updatedLines = fileLines.map(line => {
+            if (line.trim() === error.erroneousLine.trim()) {
+              foundMatch = true;
+              return error.solution;
+            }
+            return line;
+          });
+
+          if (!foundMatch) {
+            // Fallback: Look for a line containing the erroneous snippet
+            for (let i = 0; i < fileLines.length; i++) {
+              if (fileLines[i].includes(error.erroneousLine.trim())) {
+                updatedLines[i] = error.solution;
+                foundMatch = true;
+                break;
+              }
+            }
+          }
+
+          if (foundMatch) {
+            const updatedContent = updatedLines.join('\n');
+            await fs.writeFile(path.join(process.cwd(), file), updatedContent);
+            note(chalk.green('✓ Fix applied successfully!'), `File: ${file}`);
+          } else {
+            note(chalk.yellow('⚠ Could not apply fix: Line not found in file'), `File: ${file}`);
+            console.log(chalk.gray(`Debug - Original: "${error.erroneousLine}", File content:\n${content}`));
+          }
         } else {
           note(chalk.yellow('⚠ Fix skipped'), `File: ${file}`);
         }
