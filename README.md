@@ -1,6 +1,6 @@
 # OhMyFix
 
-A powerful, AI-driven CLI tool to enhance your coding experience. Fix JavaScript errors, generate code from comments, resolve dependency conflicts, and boost productivity with a customizable UI and oh-my-zsh-inspired shortcuts!
+A powerful, AI-driven CLI tool to enhance your coding experience. Fix JavaScript errors, generate code from comments, resolve dependency conflicts, and boost productivity with a customizable UI and oh-my-zsh-inspired shortcuts!.
 
 ## Features
 
