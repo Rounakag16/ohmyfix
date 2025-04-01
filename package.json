@@ -1,7 +1,7 @@
 {
   "name": "ohmyfix",
-  "version": "1.0.3",  
-  "description": "A CLI tool to fix JavaScript code errors and dependency conflicts using AI. Run `ohmyfix setup` to configure your Google API key after install.",
+  "version": "1.0.9",
+  "description": "A CLI tool to fix or generate code in files with AI, featuring theme selection and shortcuts",
   "bin": {
     "ohmyfix": "./cli.js"
   },
@@ -13,7 +13,7 @@
     "@google/generative-ai": "^0.12.0",
     "dotenv": "^16.4.5"
   },
-  "keywords": ["cli", "code-fixer", "ai", "javascript", "npm"],
+  "keywords": ["cli", "code-fixer", "ai", "javascript", "html", "shortcuts", "themes"],
   "author": "thedvlprguy",
   "license": "MIT",
   "repository": {
@@ -24,6 +24,7 @@
   "main": "cli.js",
   "files": [
     "cli.js",
-    "depfix.js"
+    "depfix.js",
+    "README.md"
   ]
 }

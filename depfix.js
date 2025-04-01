@@ -1,17 +1,33 @@
 // depfix.js
-const { execSync } = require('child_process');
+const fs = require('fs').promises;
+const path = require('path');
 
-function getConflicts() {
+async function getConflicts() {
+  const pkgPath = path.join(process.cwd(), 'package.json');
   try {
-    const output = execSync('npm ls --json', { stdio: 'pipe' });
-    const tree = JSON.parse(output);
+    const pkgContent = await fs.readFile(pkgPath, 'utf8');
+    const pkg = JSON.parse(pkgContent);
+
+    const deps = pkg.dependencies || {};
+    const devDeps = pkg.devDependencies || {};
     const conflicts = [];
-    if (tree.problems) {
-      conflicts.push(...tree.problems);
+
+    for (const dep in deps) {
+      if (devDeps[dep] && deps[dep] !== devDeps[dep]) {
+        conflicts.push(
+          `Conflict: "${dep}" - dependencies: "${deps[dep]}", devDependencies: "${devDeps[dep]}"`
+        );
+      }
     }
+
+    // Optional: Check for empty or missing sections
+    if (Object.keys(deps).length === 0 && Object.keys(devDeps).length === 0) {
+      return ['No dependencies to check'];
+    }
+
     return conflicts;
   } catch (err) {
-    return [err.message];
+    return [`Error: Could not process package.json - ${err.message}`];
   }
 }
 

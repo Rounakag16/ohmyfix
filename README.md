@@ -1,109 +1,195 @@
 # OhMyFix
 
-A sleek CLI tool powered by AI to fix JavaScript code errors and resolve dependency conflicts with ease. Say goodbye to pesky typos and hello to clean code!
+A powerful, AI-driven CLI tool to enhance your coding experience. Fix JavaScript errors, generate code from comments, resolve dependency conflicts, and boost productivity with a customizable UI and oh-my-zsh-inspired shortcuts!
 
 ## Features
-- `Code Error Fixes`: Detects and fixes syntax errors or typos (e.g., missing semicolons, `conole.log`) in `.js` files.
-- `Dependency Conflict Checker`: Analyzes `package.json` for conflicts.
-- `Interactive UI`: A polished terminal experience with prompts and spinners.
+
+- `AI Code Review`: Automatically fixes errors in all JavaScript `.js` files in your project (`ohmyfix ai`).
+- `Dependency Conflict Checker`: Scans `package.json` for version mismatches (`ohmyfix depfix`).
+- `Interactive Theme Selection`: Choose from 4 themes (Dark, Pookie Pink, Nord, Solarized) on first run, saved to `ohmyfix.config.json`.
+- `Code Snippets`: Suggests reusable JavaScript snippets based on your codebase (`ohmyfix snippets`).
+- `Real-Time Linting`: Flags JavaScript-specific issues like uncommented `console.log` or missing semicolons (`ohmyfix lint`).
+- `Debug Helper`: Provides AI-powered debugging steps for any error message (`ohmyfix debug`).
+- `Shortcuts`: Manage oh-my-zsh-style aliases for JavaScript coding (`ohmyfix shortcuts`).
+- `Snippet Fixer`: Fixes errors in pasted code snippets for any language (e.g., Python, Java) (`ohmyfix snippetfix`).
+- `File-Specific Fix/Generate`: `ohmyfix <file> --shortcut` fixes JavaScript errors or generates code based on a top comment, overwriting the file.
+- `Customizable UI`: Toggle between compact or detailed prompts and switch themes via `ohmyfix.config.json`.
 
 ## Getting Started
-Follow these steps to get OhMyFix up and running on your machine.
 
 ### Prerequisites
-- `Node.js`: Version 18.x or higher (tested with 22.13.0).
-- `npm`: Ensure it's updated (`npm install -g npm`).
-- `Google Generative AI API Key`: Get one from Google Maker Suite.
+
+- `Node.js`: 18.x or higher (tested with 22.13.0).
+- `npm`: Latest version (`npm install -g npm`).
+- `Google Generative AI API Key`: Obtain from [Google Maker Suite](https://makersuite.google.com/app/apikey).
 
 ### Installation
-Install OhMyFix globally via npm:
+
+Install globally via npm:
+
 ```bash
 npm install -g ohmyfix
 ```
 
-### Setup
-Configure your Google API key to enable AI-powered fixes:
-```bash
-ohmyfix setup
-```
-Enter your Google Generative AI API key when prompted (starts with `AI...`). The key will be saved to a `.env` file in your current directory.
+### Initial Setup
 
-> `Note`: Keep your `.env` file secure and never commit it to version control!
+Run OhMyFix:
 
-## Usage
-Run OhMyFix in any directory with JavaScript files or a `package.json`.
-
-### Interactive Mode
 ```bash
 ohmyfix
 ```
-Options:
-- `Fix dependency conflicts`: Scans `package.json` for issues.
-- `AI Code Review`: Finds and fixes errors in `.js` files.
 
-### Direct AI Code Review
-```bash
-ohmyfix ai
-```
-Scans your codebase, identifies errors, and offers fixes interactively.
+On first run, select a theme (e.g., Dark, Pookie Pink). This is saved to `ohmyfix.config.json`.
 
-#### Example
-For a file like `test.js`:
-```javascript
-console.log("Hello, world")
-conole.log("Oops")
-```
-Run:
+Set Up API Key:
+
 ```bash
-ohmyfix ai
+ohmyfix setup
 ```
-Output:
-- Detects error (`conole.log("Oops")`).
-- Suggests fix: `console.log("Oops")`.
-- Asks to apply the fix, updating only that line.
+
+Enter your Google Generative AI API key (starts with AI). Saved to `.env`.
+
+## Usage
+
+### Interactive Mode
+
+Run without arguments to access the main menu:
+
+```bash
+ohmyfix
+```
+
+Choose from options like "Fix dependency conflicts" or "Fix Selected Snippet".
+
+### File-Specific Fix/Generate
+
+Fix errors or generate code in a specific file:
+
+```bash
+ohmyfix hello.js --shortcut
+```
+
+- If `hello.js` contains valid JavaScript, it fixes syntax errors.
+- If not, or if it lacks a comment, it adds `// Generate code based on this comment` and generates code accordingly.
+- Overwrites `hello.js` with the result.
+
+## Commands
+
+- `ohmyfix ai`: AI-powered review and fix for all `.js` files.
+- `ohmyfix setup`: Configure your Google API key.
+- `ohmyfix snippets`: Suggest reusable code snippets.
+- `ohmyfix lint`: Lint your JavaScript codebase.
+- `ohmyfix debug`: Get debugging suggestions.
+- `ohmyfix shortcuts`: Manage productivity shortcuts.
+- `ohmyfix snippetfix`: Fix a pasted code snippet in any language.
+
+## Examples
+
+### Example 1: Generate Code from Comment
+
+`hello.js (before):`
+```js
+// Generate a simple webpage
+<!DOCTYPE html>
+```
+
+`Run:`
+```bash
+ohmyfix hello.js --shortcut
+```
+
+`Output:`
+```js
+// Generate a simple webpage
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Webpage</title>
+</head>
+<body>
+    <h1>Hello, World!</h1>
+</body>
+</html>
+```
+✓ `hello.js` has been updated with generated code!
+
+### Example 2: Fix JavaScript Errors
+
+`hello.js (before):`
+```js
+// Log a greeting
+conole.log("Hi"
+```
+
+`Run:`
+```bash
+ohmyfix hello.js --shortcut
+```
+
+`Output:`
+```js
+// Log a greeting
+console.log("Hi");
+```
+✓ `hello.js` has been updated with generated code!
+
+### Example 3: Empty File
+
+`hello.js (before):`
+(empty)
+
+`Run:`
+```bash
+ohmyfix hello.js --shortcut
+```
+
+`Output:`
+```js
+// Generate code based on this comment
+console.log("Generated code based on comment");
+```
+✓ `hello.js` has been updated with generated code!
+
+## Customization
+
+Edit `ohmyfix.config.json` to customize:
+
+```json
+{
+  "theme": "pookiepink",
+  "promptStyle": "compact",
+  "shortcuts": {
+    "log": "console.log"
+  }
+}
+```
+
+- `theme`: `dark`, `pookiepink`, `nord`, or `solarized`.
+- `promptStyle`: `detailed` (default) or `compact`.
+- `shortcuts`: Add custom aliases.
 
 ## Troubleshooting
-- `"No Google API key found"`: Run `ohmyfix setup` to configure it.
-- `No fixes applied`: Ensure your file has a `.js` extension and is in the current directory.
-- `Installation errors`: Update Node.js/npm and retry.
+
+- `"theme.gray is not a function"`: Ensure you’re using version 1.0.8 or higher (`npm install -g ohmyfix`).
+- `"No Google API key"`: Run `ohmyfix setup` and provide a valid key.
+- `"File not found"`: Verify the file exists in the current directory.
+- `Unexpected output`: Add a clear comment (e.g., `// Generate a calculator app`) to guide the AI.
 
 ## Contributing
-Found a bug or want a new feature? Open an issue or PR on GitHub!
+
+1. Fork the repository: [github.com/thedvlprguy/ohmyfix](https://github.com/thedvlprguy/ohmyfix).
+2. Create a feature branch (`git checkout -b feature/new-thing`).
+3. Commit changes (`git commit -m "Add new thing"`).
+4. Push to the branch (`git push origin feature/new-thing`).
+5. Open a Pull Request.
 
 ## License
-MIT © thedvlprguy
 
-## Publishing on npm
-To include `README.md` in your npm package:
+MIT © [thedvlprguy](https://github.com/thedvlprguy)
 
-1. Ensure `README.md` is in your project directory.
-2. Add to `package.json`:
-```json
-"readme": "README.md"
-```
-3. Include it in the `files` array:
-```json
-"files": [
-  "cli.js",
-  "depfix.js",
-  "README.md"
-]
-```
-4. Bump the version:
-```json
-"version": "1.0.3"
-```
-5. Publish:
-```bash
-npm publish
-```
+## Acknowledgments
 
-## (Optional) GitHub Setup
-If using GitHub:
-```bash
-git add README.md
-git commit -m "Add README for getting started"
-git push origin main
-```
+- Powered by Google Generative AI.
+- Built with Node.js, Chalk, and Clack Prompts.
 
-This README is clear, concise, and structured for easy use!

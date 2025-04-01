@@ -1,4 +1,1 @@
-// test.js
-console.log("Hello, world!");
-console.log("hello world")
-console.log("This is fine";
+// write a 4sum program
