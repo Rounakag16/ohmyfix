@@ -186,7 +186,7 @@ Edit `ohmyfix.config.json` to customize:
 
 ## License
 
-MIT © [thedvlprguy](https://github.com/thedvlprguy)
+MIT © [thedvlprguy](https://github.com/thedvlprguy) [tejsvapandey](https://github.com/tejsvapandey1) [keertikayo](https://github.com/keetikayo)
 
 ## Acknowledgments
 
